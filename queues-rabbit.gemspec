@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require_relative "lib/queues/rabbit/version"
+require_relative 'lib/queues/rabbit/version'
 
 Gem::Specification.new do |spec|
-  spec.name = "queues-rabbit"
+  spec.name = 'queues-rabbit'
   spec.version = Queues::Rabbit::VERSION
-  spec.authors = ["Lapo"]
-  spec.email = ["lapoelisacci@gmail.com"]
+  spec.authors = ['Lapo']
+  spec.email = ['lapoelisacci@gmail.com']
 
   spec.summary = 'RabbitMQ Driver for Rails Queues'
   spec.description = ''
@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.license = 'MIT'
   spec.required_ruby_version = '>= 2.6.0'
 
-  spec.metadata["homepage_uri"] = spec.homepage
+  spec.metadata['homepage_uri'] = spec.homepage
   spec.metadata['source_code_uri'] = 'https://github.com/LapoElisacci/queues-rabbit.git'
   spec.metadata['changelog_uri'] = 'https://github.com/LapoElisacci/queues-rabbit/blob/main/CHANGELOG.md'
 
@@ -25,13 +25,10 @@ Gem::Specification.new do |spec|
       (f == __FILE__) || f.match(%r{\A(?:(?:bin|test|spec|features)/|\.(?:git|travis|circleci)|appveyor)})
     end
   end
-  spec.bindir = "exe"
+  spec.bindir = 'exe'
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
-  spec.require_paths = ["lib"]
+  spec.require_paths = ['lib']
 
-  # Uncomment to register a new dependency of your gem
-  # spec.add_dependency "example-gem", "~> 1.0"
-
-  # For more information and examples about making a new gem, check out our
-  # guide at: https://bundler.io/guides/creating_gem.html
+  spec.add_dependency 'amqp-client', '~> 1'
+  spec.add_dependency 'activemodel'
 end

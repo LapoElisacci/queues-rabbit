@@ -2,6 +2,6 @@
 
 module Queues
   module Rabbit
-    VERSION = '0.1.0.pre'
+    class Client < AMQP::Client; end
   end
 end
