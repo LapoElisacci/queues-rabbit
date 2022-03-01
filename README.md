@@ -43,6 +43,8 @@ rails generate queues_rabbit
     * [Exchange Unbinding](#exchange-unbinding)
     * [Publishing](#publishing-to-an-exchange)
     * [Delete](#delete-an-exchange)
+* [Logging](#logging)
+* [Usage Tips](#usage-tips)
 
 
 ## Architecture
@@ -421,6 +423,22 @@ To delete an exchange from RabbitMQ call the **delete** method, like so:
 
 ```Ruby
 Rabbits::Exchanges::MyExchange.delete
+```
+
+## Logging
+
+Queues and Exchanges have a built-in logger.
+
+Each queue and each exchange will have its log file inside the `log` directory. The filename will match the queue/exchange name.
+
+While [consuming messages from a queue](#subscribing-a-queue), logs will also get pushed to `STDOUT`.
+
+## Usage tips
+
+A good way to implement queues subscription is to use [Rails runners](https://guides.rubyonrails.org/command_line.html#bin-rails-runner) to spawn a specific process for each connection.
+
+```Bash
+rails runner -e production "Rabbits::Queues::MyQueue.subscribe"
 ```
 
 ## Contributing
