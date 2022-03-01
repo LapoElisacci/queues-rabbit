@@ -30,5 +30,5 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'amqp-client', '~> 1'
-  spec.add_dependency 'activemodel'
+  spec.add_dependency 'queues', '0.1.0.beta'
 end

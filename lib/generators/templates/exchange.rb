@@ -3,7 +3,11 @@
 module Rabbits
   module Exchanges
     class MyExchange < ::Queues::Rabbit::Exchange
-      exchange 'my.exchange', 'my.key', durable: true, auto_delete: false, internal: false, arguments: {}
+      exchange 'my.exchange', 'direct',           # Required
+                              durable: true,      # Optional
+                              auto_delete: false, # Optional
+                              internal: false,    # Optional
+                              arguments: {}       # Optional
     end
   end
 end

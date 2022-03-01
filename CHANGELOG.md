@@ -1,5 +1,3 @@
-## [Unreleased]
+## [0.1.0.beta] - 2022-03-01
 
-## [0.1.0] - 2022-02-25
-
-- Initial release
+- Initial beta release

@@ -17,8 +17,8 @@ module Queues
         @logger.error { 'Please report to https://github.com/LapoElisacci/queues-rabbit if needed.' }
       end
 
-      def stdout(message)
-        @std.info message
+      def stdout(message, level = :info)
+        @std.send(level, message)
       end
     end
   end
