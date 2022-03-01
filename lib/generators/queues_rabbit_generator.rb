@@ -19,8 +19,8 @@ class QueuesRabbitGenerator < Rails::Generators::Base
       generate 'queues'
     end
 
-    template 'schema.rb', 'app/queues/rabbit/schema.rb'
-    template 'queue.rb', 'app/queues/rabbit/queues/my_queue.rb'
-    template 'exchange.rb', 'app/queues/rabbit/exchanges/my_exchange.rb'
+    template 'schema.rb', 'app/queues/rabbits/schema.rb'
+    template 'queue.rb', 'app/queues/rabbits/queues/my_queue.rb'
+    template 'exchange.rb', 'app/queues/rabbits/exchanges/my_exchange.rb'
   end
 end
