@@ -4,13 +4,22 @@ module Queues
   module Rabbit
     class Exchange
       class << self
-        attr_accessor :arguments, :auto_delete, :durable, :internal, :name, :type
+        attr_accessor :arguments, :auto_delete, :durable, :internal, :name, :schema, :type
 
         def bind(exchange, binding_key, arguments: {})
           exchange = exchange < Queues::Rabbit::Exchange ? exchange.name : exchange
           exchange_instance.bind(exchange, binding_key, arguments: arguments)
           true
-        rescue
+        rescue Exception => e
+          logger.error_with_report "Unable to bind '#{name}' to '#{exchange}' with key '#{binding_key}' and arguments: '#{arguments}': #{e.message}."
+          false
+        end
+
+        def delete
+          exchange_instance.delete
+          true
+        rescue Exception => e
+          logger.error_with_report "Unable to delete #{name}: #{e.message}."
           false
         end
 
@@ -26,7 +35,11 @@ module Queues
         end
 
         def exchange_instance
-          @@exchange_instance ||= Queues::Rabbit.client_instance.exchange(name, type, arguments: arguments, auto_delete: auto_delete, durable: durable, internal: internal)
+          @@exchange_instance ||= schema.client_instance.exchange(name, type, arguments: arguments, auto_delete: auto_delete, durable: durable, internal: internal)
+        end
+
+        def logger
+          @@logger ||= Queues::Rabbit::Logger.new(name, Queues::Rabbit.log_level)
         end
 
         # @param properties [Properties]
@@ -46,7 +59,8 @@ module Queues
         def publish(body, routing_key, **properties)
           exchange_instance.publish(body, name, routing_key, **properties)
           true
-        rescue
+        rescue Exception => e
+          logger.error_with_report "Unable to publish to #{name}: #{e.message}."
           false
         end
 
@@ -54,7 +68,8 @@ module Queues
           exchange = exchange < Queues::Rabbit::Exchange ? exchange.name : exchange
           exchange_instance.unbind(exchange, binding_key, arguments: arguments)
           true
-        rescue
+        rescue Exception => e
+          logger.error_with_report "Unable to unbind '#{name}' to '#{exchange}' with key '#{binding_key}' and arguments: '#{arguments}': #{e.message}."
           false
         end
       end

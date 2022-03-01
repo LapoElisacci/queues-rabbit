@@ -4,14 +4,27 @@ module Queues
   module Rabbit
     class Queue
       class << self
-        attr_accessor :arguments, :auto_delete, :durable, :name, :no_ack, :prefetch
+        attr_accessor :arguments, :auto_delete, :durable, :name, :no_ack, :prefetch, :schema
 
         def bind(exchange, binding_key, arguments: {})
           exchange = exchange < Queues::Rabbit::Exchange ? exchange.name : exchange
           queue_instance.bind(exchange, binding_key, arguments: arguments)
           true
-        rescue
+        rescue Exception => e
+          logger.error_with_report "Unable to bind '#{name}' to '#{exchange}' with key '#{binding_key}' and arguments: '#{arguments}': #{e.message}."
           false
+        end
+
+        def delete
+          queue_instance.delete
+          true
+        rescue Exception => e
+          logger.error_with_report "Unable to delete #{name}: #{e.message}."
+          false
+        end
+
+        def logger
+          @@logger ||= Queues::Rabbit::Logger.new(name, Queues::Rabbit.log_level)
         end
 
         def queue(name, arguments: {}, auto_delete: false, durable: true, no_ack: false, prefetch: 1)
@@ -25,7 +38,7 @@ module Queues
         end
 
         def queue_instance
-          @@queue_instance ||= Queues::Rabbit.client_instance.queue(name, arguments: arguments, auto_delete: auto_delete, durable: durable)
+          @@queue_instance ||= schema.client_instance.queue(name, arguments: arguments, auto_delete: auto_delete, durable: durable)
         end
 
         # @param properties [Properties]
@@ -47,22 +60,41 @@ module Queues
         def publish(body, **properties)
           queue_instance.publish(body, **properties)
           true
-        rescue
+        rescue Exception => e
+          logger.error_with_report "Unable to publish to #{name}: #{e.message}."
+          false
+        end
+
+        def purge
+          queue_instance.purge
+          true
+        rescue Exception => e
+          logger.error_with_report "Unable to purge #{name}: #{e.message}."
           false
         end
 
         def start
-          handler = new
+          logger.info { "Subscribing to queue #{name}" }
+          consumer = new
           queue_instance.subscribe(no_ack: no_ack, prefetch: prefetch) do |message|
-            handler.consume(message)
+            consumer.consume(Queues::Rabbit::Message.new(message))
           end
+
+          loop do
+            logger.stdout "Connection to #{name} alive."
+            sleep 10
+          end
+        rescue Exception => e
+          logger.error_with_report "Unable to connect to #{name}: #{e.message}."
+          false
         end
 
         def unbind(exchange, binding_key, arguments: {})
           exchange = exchange < Queues::Rabbit::Exchange ? exchange.name : exchange
           queue_instance.unbind(exhange, binding_key, arguments: arguments)
           true
-        rescue
+        rescue Exception => e
+          logger.error_with_report "Unable to unbind '#{name}' to '#{exchange}' with key '#{binding_key}' and arguments: '#{arguments}': #{e.message}."
           false
         end
       end
