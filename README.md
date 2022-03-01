@@ -24,6 +24,27 @@ The gem gets shipped with a scaffolding generator.
 rails generate queues_rabbit
 ```
 
+## Table of contents
+
+* [Architecture](#architecture)
+* [Rails Queues](#rails-queues)
+* [Schema](#schema)
+* [Queues](#queues)
+    * [Definition](#queue-definition)
+    * [Subscribing](#subscribing-a-queue)
+    * [Publishing](#publishing-to-queues)
+    * [Purge](#purge-a-queue)
+    * [Delete](#delete-a-queue)
+* [Exchanges](#exchanges)
+    * [Definition](#exchange-definition)
+    * [Queue Binding](#queue-binding)
+    * [Queue Unbinding](#queue-unbinding)
+    * [Exchange Binding](#exchange-binding)
+    * [Exchange Unbinding](#exchange-unbinding)
+    * [Publishing](#publishing-to-an-exchange)
+    * [Delete](#delete-an-exchange)
+
+
 ## Architecture
 
 The framework consists of a Schema where you can register your RabbitMQ Queues and Exchanges.
@@ -44,7 +65,7 @@ app
 
 The gem belongs to the [Rails-Queues](https://github.com/LapoElisacci/queues) framework.
 
-To initialize your Rabbit schema, add it to the `ApplicationQueue` class.
+To initialize your RabbitMQ schema, add it to the `ApplicationQueue` class.
 
 ```Ruby
 class ApplicationQueue < Queues::API
@@ -94,7 +115,7 @@ end
 
 Each queue can be declared by a class that inherits from `Queues::Rabbit::Queue`
 
-### Definition
+### Queue Definition
 
 ```Ruby
 module Rabbits
@@ -129,7 +150,7 @@ Params **durable**, **auto_delete** and **arguments** are optional, default valu
 
 (Remember to register the queue class to the Schema, more details [here](#schema))
 
-### Consuming
+### Subscribing a queue
 
 To compute a message when it gets received, define a method called `consume` inside your queue Class, like so:
 
@@ -186,7 +207,16 @@ end
 
 The **consume** method will get executed inside a separated thread, make sure it's threadsafe!
 
-### Publishing
+After defining the **consume** method, to subscribe the queue call the, call the **subscribe** method, like so:
+
+```Ruby
+Rabbits::Queues::MyQueue.subscribe
+```
+
+The method won't return until the connection gets closed.
+Aliveness logs will get printed to **STDOUT**.
+
+### Publishing to queues
 
 To publish a message into a declared queue, call the **publish** method:
 
@@ -220,17 +250,7 @@ The **publish** method accepts several options, here's the method documentation:
 def publish(body, **properties)
 ```
 
-### Exchange unbinding
-
-Check how to bind an exchange to a queue if needed, [here]()
-
-To unbid a queue from a RabbitMQ exchange, call the **unbind** method, like so:
-
-```Ruby
-Rabbits::Queues::MyQueue.unbind('my.exchange', 'my.binding.key', arguments: {})
-```
-
-### Purge
+### Purge a queue
 
 To purge all messages from a defined queue, call the **purge** method, like so:
 
@@ -238,7 +258,7 @@ To purge all messages from a defined queue, call the **purge** method, like so:
 Rabbits::Queues::MyQueue.purge
 ```
 
-### Delete
+### Delete a queue
 
 To delete a queue from RabbitMQ, call the **delete** method, like so:
 
@@ -250,7 +270,7 @@ Rabbits::Queues::MyQueue.delete
 
 Just like queues, exchanges must be declared by a class that inherits, this time, from `Queues::Rabbit::Exchange`
 
-### Definition
+### Exchange Definition
 
 ```Ruby
 module Rabbits
@@ -266,7 +286,7 @@ module Rabbits
 end
 ```
 
-The `exchange` method allows you to define the RabbitMQ exchange parameters.
+The `exchange` method allows you to define the exchange parameters.
 
 - The exchange name
 - The exchange type ('direct', 'fanout', 'headers', 'topic' ...)
@@ -306,11 +326,25 @@ You can also statically declare the exchange name, like so:
 bind 'my.exchange', 'my.binding.key', arguments: {}
 ```
 
-The `bind` method allows you to define the RabbitMQ queue-exchange binding parameters.
+The `bind` method allows you to define the queue-exchange binding parameters.
 
 - The exchange name
 - The binding key
 - **arguments:** Message headers to match on (only relevant for header exchanges)
+
+### Queue unbinding
+
+To unbind a queue from an exchange call the **unbind** method, like so:
+
+```Ruby
+Rabbits::Queues::MyQueue.unbind(Rabbits::Exchanges::MyExchange, 'my.binding.key', arguments: {})
+```
+
+or
+
+```Ruby
+Rabbits::Queues::MyQueue.unbind('my.exchange', 'my.binding.key', arguments: {})
+```
 
 ### Exchange binding
 
@@ -332,7 +366,21 @@ module Rabbits
 end
 ```
 
-### Publishing
+### Exchange unbinding
+
+To unbind an exchange from another exchange call the **unbind** method, like so:
+
+```Ruby
+Rabbits::Exchanges::MyExchange.unbind(Rabbits::Exchanges::MyExchangeTwo, 'my.binding.key', arguments: {})
+```
+
+or
+
+```Ruby
+Rabbits::Exchanges::MyExchange.unbind('my.exchange.two', 'my.binding.key', arguments: {})
+```
+
+### Publishing to an exchange
 
 To publish a message to an exchange call the **publish** method, like so:
 
@@ -367,11 +415,13 @@ The **publish** method accepts several options, here's the method documentation:
 def publish(body, routing_key, **properties)
 ```
 
-## Development
+### Delete an exchange
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+To delete an exchange from RabbitMQ call the **delete** method, like so:
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+```Ruby
+Rabbits::Exchanges::MyExchange.delete
+```
 
 ## Contributing
 
