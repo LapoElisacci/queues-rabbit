@@ -3,6 +3,6 @@
 module Rabbits
   class Schema < ::Queues::Rabbit::Schema
     queue Rabbits::Queues::MyQueue
-    exchange Rabbits::Queues::MyExchange
+    exchange Rabbits::Exchanges::MyExchange
   end
 end
