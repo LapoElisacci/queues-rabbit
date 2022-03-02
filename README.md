@@ -147,9 +147,11 @@ The `queue` method allows you to define the RabbitMQ queue parameters.
 - **prefetch:** Specify how many messages to prefetch.
 - **arguments:** Custom arguments, such as queue-ttl etc.
 
-Params **durable**, **auto_delete** and **arguments** are optional, default values are:
-- **durable:** true
+Params **auto_ack**, **auto_delete**, **durable**, **prefetch** and **arguments** are optional, default values are:
+- **auto_ack:** true
 - **auto_delete:** false
+- **durable:** true
+- **prefetch:** 1
 - **arguments:** {}
 
 (Remember to register the queue class to the Schema, more details [here](#schema))
