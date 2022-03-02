@@ -144,12 +144,14 @@ The `queue` method allows you to define the RabbitMQ queue parameters.
 - **auto_ack:** When false messages have to be manually acknowledged (or rejected)
 - **auto_delete:** If true, the queue will be deleted when the last consumer stops consuming.
 - **durable:** If true, the queue will survive broker restarts, messages in the queue will only survive if they are published as persistent.
-- **prefetch:** Specify how many messages to prefetch for consumers (with no_ack is false)
+- **prefetch:** Specify how many messages to prefetch.
 - **arguments:** Custom arguments, such as queue-ttl etc.
 
-Params **durable**, **auto_delete** and **arguments** are optional, default values are:
-- **durable:** true
+Params **auto_ack**, **auto_delete**, **durable**, **prefetch** and **arguments** are optional, default values are:
+- **auto_ack:** true
 - **auto_delete:** false
+- **durable:** true
+- **prefetch:** 1
 - **arguments:** {}
 
 (Remember to register the queue class to the Schema, more details [here](#schema))
