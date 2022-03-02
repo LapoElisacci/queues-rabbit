@@ -6,6 +6,15 @@ module Queues
       class << self
         attr_accessor :arguments, :auto_delete, :durable, :internal, :name, :schema, :type
 
+        #
+        # Bind an Exchange to another Exchange
+        #
+        # @param [String] exchange Exchange name
+        # @param [String] binding_key Exchange binding key
+        # @param [Hash] arguments Message headers to match on (only relevant for header exchanges)
+        #
+        # @return [Boolean] True if bounded, false otherwise
+        #
         def bind(exchange, binding_key, arguments: {})
           exchange = exchange < Queues::Rabbit::Exchange ? exchange.name : exchange
           exchange_instance.bind(exchange, binding_key, arguments: arguments)
@@ -15,6 +24,11 @@ module Queues
           false
         end
 
+        #
+        # Delete an Exchange from RabbitMQ
+        #
+        # @return [Boolean] True if deleted, false otherwise
+        #
         def delete
           exchange_instance.delete
           true
@@ -23,6 +37,18 @@ module Queues
           false
         end
 
+        #
+        # Declare an Exchange
+        #
+        # @param [String] name Exchange name
+        # @param [String] type Exchange type
+        # @param [Hash] arguments Exchange custom arguments
+        # @param [Boolean] auto_delete If true, the exchange will be deleted when the last queue/exchange gets unbounded.
+        # @param [Boolean] durable If true, the exchange will persist between broker restarts, also a required for persistent messages.
+        # @param [Boolean] internal If true, the messages can't be pushed directly to the exchange.
+        #
+        # @return [Queues::Rabbit::Exchange] Exchange class
+        #
         def exchange(name, type, arguments: {}, auto_delete: false, durable: true, internal: false)
           self.arguments = arguments
           self.auto_delete = auto_delete
@@ -34,16 +60,8 @@ module Queues
           self
         end
 
-        def exchange_instance
-          @@exchange_instance ||= schema.client_instance.exchange(name, type, arguments: arguments, auto_delete: auto_delete, durable: durable, internal: internal)
-        end
-
-        def logger
-          @@logger ||= Queues::Rabbit::Logger.new(name, Queues::Rabbit.log_level)
-        end
-
         #
-        # <Description>
+        # Publish a message to the Exchange
         #
         # @param [String] body                                 The message body, can be a string or either a byte array
         # @param [String] routing_key                          The routing key to route the message to bounded queues
@@ -74,6 +92,15 @@ module Queues
           false
         end
 
+        #
+        # Unbind the Exchange from another Exchange
+        #
+        # @param [String] exchange The exchange name to unbind
+        # @param [String] binding_key The exchange binding key
+        # @param [Hash] arguments Message headers to match on (only relevant for header exchanges)
+        #
+        # @return [Boolean] True if unbound, false otherwise
+        #
         def unbind(exchange, binding_key, arguments: {})
           exchange = exchange < Queues::Rabbit::Exchange ? exchange.name : exchange
           exchange_instance.unbind(exchange, binding_key, arguments: arguments)
@@ -82,6 +109,26 @@ module Queues
           logger.error_with_report "Unable to unbind '#{name}' to '#{exchange}' with key '#{binding_key}' and arguments: '#{arguments}': #{e.message}."
           false
         end
+
+        private
+
+          #
+          # Return the Exchange instance
+          #
+          # @return [AMQP::Client::Exchange] Exchange instance
+          #
+          def exchange_instance
+            @@exchange_instance ||= schema.client_instance.exchange(name, type, arguments: arguments, auto_delete: auto_delete, durable: durable, internal: internal)
+          end
+
+          #
+          # Return the logger instance
+          #
+          # @return [Queues::Rabbit::Logger] Logger instance
+          #
+          def logger
+            @@logger ||= Queues::Rabbit::Logger.new(name, Queues::Rabbit.log_level)
+          end
       end
     end
   end

@@ -2,6 +2,9 @@
 
 module Queues
   module Rabbit
+    #
+    # AMQP::Client::Message wrapper class
+    #
     class Message < AMQP::Client::Message
       def initialize(message)
         message.instance_variables.each do |variable|

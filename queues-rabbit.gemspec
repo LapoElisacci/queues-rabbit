@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors = ['Lapo']
   spec.email = ['lapoelisacci@gmail.com']
 
-  spec.summary = 'RabbitMQ Driver for Rails Queues'
-  spec.description = ''
+  spec.summary = 'A Rails implementation of RabbitMQ'
+  spec.description = 'The gem allows you to integrate RabbitMQ into a Rails application in a Ruby Style fashion.'
   spec.homepage = 'https://github.com/LapoElisacci/queues.git'
   spec.license = 'MIT'
   spec.required_ruby_version = '>= 2.6.0'
