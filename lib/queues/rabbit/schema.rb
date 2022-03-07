@@ -4,7 +4,7 @@ module Queues
   module Rabbit
     class Schema
       class << self
-        attr_accessor :client, :exchanges, :queues, :batched_queues
+        attr_accessor :client, :exchanges, :queues
 
         #
         # Return the client instance
@@ -34,17 +34,6 @@ module Queues
         def queue(klass)
           self.queues ||= []
           self.queues << klass
-          klass.schema = self
-        end
-
-        #
-        # Register a Batched Queue
-        #
-        # @param [Queues::Rabbit::BatchedQueue] klass BatchedQueue class to register
-        #
-        def batched_queue(klass)
-          self.batched_queues ||= []
-          self.batched_queues << klass
           klass.schema = self
         end
       end
