@@ -146,27 +146,27 @@ module Queues
           logger.error_with_report "Unable to unbind '#{name}' to '#{exchange}' with key '#{binding_key}' and arguments: '#{arguments}': #{e.message}."
           false
         end
+
+        private
+
+          #
+          # Return the logger instance
+          #
+          # @return [Queues::Rabbit::Logger] Logger instance
+          #
+          def logger
+            @@logger ||= Queues::Rabbit::Logger.new(name, Queues::Rabbit.log_level)
+          end
+
+          #
+          # Return the Queue instance
+          #
+          # @return [AMQP::Client::Client] Queue instance
+          #
+          def queue_instance
+            @@queue_instance ||= schema.client_instance.queue(name, arguments: arguments, auto_delete: auto_delete, durable: durable)
+          end
       end
-
-      private
-
-        #
-        # Return the logger instance
-        #
-        # @return [Queues::Rabbit::Logger] Logger instance
-        #
-        def logger
-          @@logger ||= Queues::Rabbit::Logger.new(name, Queues::Rabbit.log_level)
-        end
-
-        #
-        # Return the Queue instance
-        #
-        # @return [AMQP::Client::Client] Queue instance
-        #
-        def queue_instance
-          @@queue_instance ||= schema.client_instance.queue(name, arguments: arguments, auto_delete: auto_delete, durable: durable)
-        end
     end
   end
 end
