@@ -4,7 +4,6 @@ require 'active_support'
 require 'amqp-client'
 require 'logger'
 
-require_relative 'rabbit/batched_queue'
 require_relative 'rabbit/client'
 require_relative 'rabbit/exchange'
 require_relative 'rabbit/logger'
