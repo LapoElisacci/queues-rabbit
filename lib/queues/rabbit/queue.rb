@@ -172,7 +172,7 @@ module Queues
           loop do
             logger.stdout "Connection to #{name} alive."
             sleep batch_timeout
-            queue_instance.publish('', type: 'timeout')  # Special 'timeout' message
+            queue_instance.publish('', type: 'timeout', persistent: false, espiration: 3.seconds)
           end
         rescue Exception => e
           logger.error_with_report "Unable to connect to #{name}: #{e.message}."
