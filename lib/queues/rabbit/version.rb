@@ -2,6 +2,6 @@
 
 module Queues
   module Rabbit
-    VERSION = '0.1.0.beta'
+    VERSION = '0.1.0.beta.1'
   end
 end
