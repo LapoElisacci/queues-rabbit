@@ -28,6 +28,10 @@ module Queues
           raise NoMethodError.new("Method #{__method__} must be defined to subscribe a queue!")
         end
 
+        def batch_consume(_messages)
+          raise NoMethodError.new("Method #{__method__} must be defined to batch-subscribe a queue!")
+        end
+
         #
         # Delete a Queue from RabbitMQ
         #
@@ -130,6 +134,52 @@ module Queues
         end
 
         #
+        # Subscribe to the queue with a batch reading.
+        # This method will block.
+        #
+        # @param [Integer] batch_size Batch size
+        # @param [ActiveSupport::Duration] batch_timeout Batch timeout, that the time interval in which the batch will be emptied even if not full.
+        #
+        # @return [FalseClass] if errors
+        #
+        def batch_subscribe(batch_size:, batch_timeout:)
+          raise StandardError.new('Batch size must be a positive integer') if batch_size.to_i <= 0
+          raise StandardError.new("Batch size must be less or equal than prefetch: got batch_size=#{batch_size} and prefetch=#{prefetch}") if batch_size > prefetch
+
+          logger.info "Subscribing to queue #{name} with a batch size #{batch_size}"
+          consumer = new
+          batch = []
+          # Batched subscribe must be performed only by one thread
+          # Auto-acking is done manually, otherwise batching is not possible
+          queue_instance.subscribe(worker_threads: 1, no_ack: false, prefetch: prefetch) do |message|
+            if message.properties.type == 'timeout'
+              message.ack  # Remove the timeout message from the queue
+              min_batch_size = 0
+            else
+              batch << Queues::Rabbit::Message.new(message)
+              min_batch_size = batch_size
+            end
+            if batch.size > 0 && batch.size >= min_batch_size
+              batch.each(&:ack) if no_ack
+              consumer.batch_consume(batch)
+              batch = []
+            end
+          rescue Exception => e
+            logger.error { e.message }
+            logger.stdout e.message, :error
+          end
+
+          loop do
+            logger.stdout "Connection to #{name} alive."
+            sleep batch_timeout
+            queue_instance.publish('', type: 'timeout', persistent: false, espiration: 3.seconds)
+          end
+        rescue Exception => e
+          logger.error_with_report "Unable to connect to #{name}: #{e.message}."
+          false
+        end
+
+        #
         # Unbind a Queue from an Exchange
         #
         # @param [String] exchange Exchange name
@@ -146,27 +196,27 @@ module Queues
           logger.error_with_report "Unable to unbind '#{name}' to '#{exchange}' with key '#{binding_key}' and arguments: '#{arguments}': #{e.message}."
           false
         end
+
+        private
+
+          #
+          # Return the logger instance
+          #
+          # @return [Queues::Rabbit::Logger] Logger instance
+          #
+          def logger
+            @@logger ||= Queues::Rabbit::Logger.new(name, Queues::Rabbit.log_level)
+          end
+
+          #
+          # Return the Queue instance
+          #
+          # @return [AMQP::Client::Client] Queue instance
+          #
+          def queue_instance
+            @@queue_instance ||= schema.client_instance.queue(name, arguments: arguments, auto_delete: auto_delete, durable: durable)
+          end
       end
-
-      private
-
-        #
-        # Return the logger instance
-        #
-        # @return [Queues::Rabbit::Logger] Logger instance
-        #
-        def logger
-          @@logger ||= Queues::Rabbit::Logger.new(name, Queues::Rabbit.log_level)
-        end
-
-        #
-        # Return the Queue instance
-        #
-        # @return [AMQP::Client::Client] Queue instance
-        #
-        def queue_instance
-          @@queue_instance ||= schema.client_instance.queue(name, arguments: arguments, auto_delete: auto_delete, durable: durable)
-        end
     end
   end
 end

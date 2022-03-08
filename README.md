@@ -108,7 +108,7 @@ module Rabbits
   class Schema < ::Queues::Rabbit::Schema
     queue Rabbits::Queues::MyQueueOne
     exchange Rabbits::Queues::MyExchangeOne
-    
+
     queue Rabbits::Queues::MyQueueTwo
     exchange Rabbits::Queues::MyExchangeTwo
   end
@@ -131,7 +131,7 @@ module Rabbits
             durable: true,
             prefetch: 1,
             arguments: {}
-      
+
       # ...
     end
   end
@@ -170,7 +170,7 @@ module Rabbits
             durable: true,
             prefetch: 1,
             arguments: {}
-      
+
       def consume(message)
         # do something with the message
       end
@@ -197,7 +197,7 @@ module Rabbits
     class MyQueue < ::Queues::Rabbit::Queue
       queue 'my.queue',
             auto_ack: false,
-      
+
       def consume(message)
         puts message.body
         message.ack
@@ -317,9 +317,9 @@ module Rabbits
             durable: true,
             prefetch: 1,
             arguments: {}
-      
+
       bind Rabbits::Exchanges::MyExchange, 'my.binding.key', arguments: {}
-      
+
       # ...
     end
   end
@@ -365,7 +365,7 @@ module Rabbits
                               durable: true,
                               internal: false,
                               arguments: {}
-      
+
       bind Rabbits::Exchanges::MyExchangeTwo, 'my.binding.key', arguments: {}
     end
   end
@@ -443,6 +443,15 @@ A good way to implement queues subscription is to use [Rails runners](https://gu
 
 ```Bash
 rails runner -e production "Rabbits::Queues::MyQueue.subscribe"
+```
+
+If you are running the queues in development mode, there could be some problems due to the Rails lazy loading. To solve this issue, you can add the following lines to `config/environments/development.rb`:
+
+```Ruby
+config.eager_load_paths += Dir["app/queues/**/*.rb"]
+ActiveSupport::Reloader.to_prepare do
+  Dir["app/queues/**/*.rb"].each { |f| require_dependency("#{Dir.pwd}/#{f}") }
+end
 ```
 
 ## Contributing
