@@ -1,10 +1,10 @@
-# <img src="https://user-images.githubusercontent.com/50866745/156147715-d3773642-68c0-48c0-92ad-0ccc442ee881.svg" width="48"> Rails-Queues Rabbit
+# <img src="https://user-images.githubusercontent.com/50866745/156147715-d3773642-68c0-48c0-92ad-0ccc442ee881.svg" width="48"> Rails-Queues Rabbit <!-- omit in toc -->
 ![](https://img.shields.io/static/v1?label=Language&message=Ruby&color=red)
 ![](https://img.shields.io/static/v1?label=Latest&message=0.1.0.beta&color=blue)
 
 A Rails implementation of [RabbitMQ](https://www.rabbitmq.com/)
 
-## Installation
+## Installation <!-- omit in toc -->
 
 Add this line to your application's Gemfile:
 
@@ -18,7 +18,7 @@ And then execute:
 bundle install
 ```
 
-## Getting Started
+## Getting Started <!-- omit in toc -->
 
 The gem gets shipped with a scaffolding generator.
 
@@ -26,27 +26,31 @@ The gem gets shipped with a scaffolding generator.
 rails generate queues_rabbit
 ```
 
-## Table of contents
+## Table of contents <!-- omit in toc -->
 
-* [Architecture](#architecture)
-* [Rails Queues](#rails-queues)
-* [Schema](#schema)
-* [Queues](#queues)
-    * [Definition](#queue-definition)
-    * [Subscribing](#subscribing-a-queue)
-    * [Publishing](#publishing-to-queues)
-    * [Purge](#purge-a-queue)
-    * [Delete](#delete-a-queue)
-* [Exchanges](#exchanges)
-    * [Definition](#exchange-definition)
-    * [Queue Binding](#queue-binding)
-    * [Queue Unbinding](#queue-unbinding)
-    * [Exchange Binding](#exchange-binding)
-    * [Exchange Unbinding](#exchange-unbinding)
-    * [Publishing](#publishing-to-an-exchange)
-    * [Delete](#delete-an-exchange)
-* [Logging](#logging)
-* [Usage Tips](#usage-tips)
+- [Architecture](#architecture)
+- [Rails-Queues](#rails-queues)
+- [Schema](#schema)
+- [Queues](#queues)
+  - [Queue Definition](#queue-definition)
+  - [Subscribing a queue](#subscribing-a-queue)
+  - [WARNING](#warning)
+  - [Publishing to queues](#publishing-to-queues)
+  - [Purge a queue](#purge-a-queue)
+  - [Delete a queue](#delete-a-queue)
+- [Exchanges](#exchanges)
+  - [Exchange Definition](#exchange-definition)
+  - [Queue binding](#queue-binding)
+  - [Queue unbinding](#queue-unbinding)
+  - [Exchange binding](#exchange-binding)
+  - [Exchange unbinding](#exchange-unbinding)
+  - [Publishing to an exchange](#publishing-to-an-exchange)
+  - [Delete an exchange](#delete-an-exchange)
+- [Logging](#logging)
+- [Usage tips](#usage-tips)
+- [Contributing](#contributing)
+- [Credits](#credits)
+- [License](#license)
 
 
 ## Architecture
