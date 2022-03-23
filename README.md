@@ -1,7 +1,7 @@
 # <img src="https://user-images.githubusercontent.com/50866745/156147715-d3773642-68c0-48c0-92ad-0ccc442ee881.svg" width="48"> Rails-Queues Rabbit <!-- omit in toc -->
 ![](https://img.shields.io/static/v1?label=Language&message=Ruby&color=red)
 ![](https://img.shields.io/static/v1?label=Latest&message=0.1.0.beta&color=blue)
-[![StandWithUkraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md)
+![StandWithUkraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)
 
 
 A Rails implementation of [RabbitMQ](https://www.rabbitmq.com/)
